@@ -103,9 +103,9 @@ pipeline {
 
         stage('Promote to Staging Env') {
             steps {
-                //timeout(time: 60, unit: 'MINUTES') {
-                //    input message: "Promote to Staging?"
-                //}
+                timeout(time: 60, unit: 'MINUTES') {
+                    input message: "Promote to Staging?"
+                }
                 //TODO: Tag the books:latest image stream as books:stage
                 script {
                   openshift.withCluster() {
@@ -146,7 +146,7 @@ pipeline {
                         openshift.withProject( "${STAGE_PROJECT}" ) {
                           def deployment = openshift.selector("dc", "${APP_NAME}").rollout()
                           openshift.selector("dc", "${APP_NAME}").related('pods').untilEach(1) {
-                            return (it.object().status.phase = "Running")
+                            return (it.object().status.phase == "Running")
                           }
                         }
 
